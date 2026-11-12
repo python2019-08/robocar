@@ -6,3 +6,4 @@ log/
 rospack_cache_*
 log*.csv
 scripts/local/
+robocar_log.csv

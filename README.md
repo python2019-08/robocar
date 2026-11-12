@@ -49,6 +49,21 @@ The launch group to use must be specified in the `"global"` section under the `"
 External ROS2 nodes should be added and configured using [`robocar.launch.py`](./src/robocar/launch/robocar.launch.py).
 
 ### Build
+
+```sh
+# abner added.
+# To avoid another round trip, this is the full set of robocar's remaining REQUIRED finds
+# from src/robocar/CMakeLists.txt — cross-check against the Dockerfile list, 
+# which already contains all of them:
+sudo apt install libgstreamer1.0-dev libgstrtspserver-1.0-dev \
+    gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+    libsdl2-dev libzmq3-dev qtbase5-dev libomp-dev libpcap-dev rapidjson-dev \
+    libeigen3-dev libopencv-dev libpcl-dev \
+    ros-jazzy-cv-bridge ros-jazzy-pcl-ros ros-jazzy-tf2-ros ros-jazzy-rviz2 \
+    ros-jazzy-image-transport-plugins ros-jazzy-common-interfaces
+```
+
 * Debug : `bash scripts/build.sh debug`.<br>
 * Release : `bash scripts/build.sh release`.
 

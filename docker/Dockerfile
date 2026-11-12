@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM docker.io/ros:jazzy
 
 # install tools and libraries
@@ -16,8 +17,23 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
 
 # install python libraries
 RUN python3 -m venv /venv
-RUN /venv/bin/pip install ultralytics pygame pyzmq vidgear
-RUN /venv/bin/pip install catkin_pkg empy lark
+
+# pip 缓存挂载 + 重试：torch 的 CUDA 依赖有 2~3GB，网络抖动时不要让整层作废重下
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -eux; \
+    ok=0; \
+    for i in 1 2 3 4 5; do \
+        if /venv/bin/pip install --timeout 120 --retries 20 \
+               -i https://pypi.tuna.tsinghua.edu.cn/simple \
+               ultralytics==8.4.100 pygame pyzmq vidgear; then ok=1; break; fi; \
+        echo "==> pip attempt $i failed, retrying in 10s"; sleep 10; \
+    done; \
+    [ "$ok" = 1 ]
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    /venv/bin/pip install --timeout 120 --retries 20 \
+        -i https://pypi.tuna.tsinghua.edu.cn/simple \
+        catkin_pkg empy lark
 ENV PATH="/venv/bin:$PATH"
 
 # clear cache
